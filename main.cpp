@@ -205,6 +205,34 @@ void getPosition(const std::string& accessToken, const std::string& instrument) 
     }
 }
 
+// Function to print all open orders with instrument, order ID, price, and amount
+void getOpenOrders(const std::string& accessToken) {
+    json payload = {
+        {"jsonrpc", "2.0"},
+        {"method", "private/get_open_orders"},
+        {"params", {{"kind", "future"}, {"type", "limit"}}},
+        {"id", 25}
+    };
+
+    std::string response = sendRequest("https://test.deribit.com/api/v2/private/get_open_orders", payload, accessToken);
+    auto responseJson = json::parse(response);
+
+    // Check if the response contains the "result" array
+    if (responseJson.contains("result")) {
+        std::cout << "Open Orders:\n\n";
+        for (const auto& order : responseJson["result"]) {
+            std::string instrument = order["instrument_name"];
+            std::string orderId = order["order_id"];
+            double price = order["price"];
+            double amount = order["amount"];
+
+            std::cout << "Instrument: " << instrument << ", Order ID: " << orderId
+                      << ", Price: " << price << ", Amount: " << amount << '\n';
+        }
+    } else {
+        std::cerr << "Error: Could not retrieve open orders." << std::endl;
+    }
+}
 
 int main() {
     // Replace with your actual client credentials
@@ -216,18 +244,20 @@ int main() {
 
     if (!accessToken.empty()) {
         
-        placeOrder("50000", accessToken, "10","ETH-PERPETUAL");
+        //placeOrder("50000", accessToken, "10","ETH-PERPETUAL");
 
-        cancelOrder(accessToken,"29257473891");
+        //cancelOrder(accessToken,"29257473891");
 
-        modifyOrder(accessToken,"29231860132",30,30);
+        //modifyOrder(accessToken,"29231860132",30,30);
 
-        getOrderBook(accessToken,"BTC-PERPETUAL");
+        //getOrderBook(accessToken,"BTC-PERPETUAL");
 
-        std::cout<<"\n";
+        //std::cout<<"\n";
 
-        getPosition(accessToken, "BTC-PERPETUAL");
+        //getPosition(accessToken, "BTC-PERPETUAL");
         
+        getOpenOrders(accessToken);
+
     } else {
         std::cerr << "Unable to obtain access token, aborting operations." << std::endl;
     }
